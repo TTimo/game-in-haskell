@@ -38,14 +38,16 @@ main :: IO ()
 main = do
   withWindow 640 480 "vsync check" $ \win -> do
          start <- getCurrentTime
-         loop win
+         frames <- loop win 0
          stop <- getCurrentTime
-         print $ diffUTCTime stop start
+         print $ show frames ++ " frames in " ++ show (diffUTCTime stop start) ++ " seconds: " ++ show ( fromIntegral frames / ( diffUTCTime stop start ) ) ++ " fps."
          exitSuccess
 
-loop :: Window -> IO ()         
-loop window = do
+loop :: Window -> Int -> IO Int
+loop window counter = do
   pollEvents
   renderFrame window
   k <- keyIsPressed window Key'Escape
-  unless k $ loop window
+  if k
+     then return counter
+     else loop window (counter + 1)
