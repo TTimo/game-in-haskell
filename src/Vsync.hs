@@ -1,7 +1,7 @@
 {-# LANGUAGE PackageImports #-}
 import "GLFW-b" Graphics.UI.GLFW as GLFW
 import System.Exit (exitSuccess)
-import Control.Monad (when, unless)
+import Control.Monad (when)
 import Data.Time
     
 withWindow :: Int -> Int -> String -> (GLFW.Window -> IO ()) -> IO ()
@@ -33,14 +33,17 @@ isPress _                  = False
 renderFrame :: Window -> IO ()
 renderFrame window = do
   swapBuffers window
-                             
+
+fpsMessage :: Int -> NominalDiffTime -> String
+fpsMessage frames elapsed = show frames ++ " frames in " ++ show elapsed ++ " seconds: " ++ show ( fromIntegral frames / elapsed ) ++ " fps."
+
 main :: IO ()
 main = do
   withWindow 640 480 "vsync check" $ \win -> do
          start <- getCurrentTime
          frames <- loop win 0
          stop <- getCurrentTime
-         print $ show frames ++ " frames in " ++ show (diffUTCTime stop start) ++ " seconds: " ++ show ( fromIntegral frames / ( diffUTCTime stop start ) ) ++ " fps."
+         putStrLn $ fpsMessage frames (diffUTCTime stop start)
          exitSuccess
 
 loop :: Window -> Int -> IO Int
