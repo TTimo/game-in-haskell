@@ -22,7 +22,7 @@ main = do
           loop win initialPlayer glossState
           exitSuccess
     where loop window state glossState =  do
-            threadDelay 20000
+--            threadDelay 20000
             pollEvents
             k <- keyIsPressed window Key'Escape
             l <- keyIsPressed window Key'Left
