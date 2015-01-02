@@ -44,12 +44,19 @@ outsideOfLimits (xmon, ymon) size = xmon > fromIntegral width/2 - size/2 ||
                                     ymon > fromIntegral height/2 - size/2 ||
                                     ymon < (-(fromIntegral height)/2 + size/2)
 
-move (True, _, _, _) (Player (xpos, ypos)) increment = Player ((xpos - increment), ypos)
-move (_, True, _, _) (Player (xpos, ypos)) increment = Player ((xpos + increment), ypos)
-move (_, _, True, _) (Player (xpos, ypos)) increment = Player (xpos, (ypos + increment))
-move (_, _, _, True) (Player (xpos, ypos)) increment = Player (xpos, (ypos - increment))
-move (False, False, False, False) (Player (xpos, ypos)) _ = Player (xpos, ypos)
+move :: (Bool, Bool, Bool, Bool) -> Player -> Float -> Player
+move ( l, r, u, d ) player@( Player (xpos, ypos)) increment = moveLR ( l, r ) ( moveUD ( u, d ) player increment ) increment
 
+moveLR :: (Bool, Bool) -> Player -> Float -> Player
+moveLR (True, False ) ( Player ( xpos, ypos ) ) increment = Player ( ( xpos - increment ), ypos )
+moveLR (False, True ) ( Player ( xpos, ypos ) ) increment = Player ( ( xpos + increment ), ypos )
+moveLR ( _, _ ) (Player ( xpos, ypos ) ) _ = Player (xpos, ypos)
+
+moveUD :: (Bool, Bool) -> Player -> Float -> Player
+moveUD (True, False ) ( Player ( xpos, ypos ) ) increment = Player ( xpos, (ypos + increment) )
+moveUD (False, True ) ( Player ( xpos, ypos ) ) increment = Player ( xpos, (ypos - increment) )
+moveUD ( _, _ ) (Player (xpos, ypos)) _ = Player (xpos, ypos)
+                                                            
 renderFrame (Player (xpos, ypos)) window glossState = do
    displayPicture (width, height) white glossState 1.0 $ translate xpos ypos $ rectangleSolid playerSize playerSize
    swapBuffers window
